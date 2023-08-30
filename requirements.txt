@@ -1,0 +1,6 @@
+pyinstaller
+pystray
+pillow==9.5
+requests
+pywin32
+lxml
