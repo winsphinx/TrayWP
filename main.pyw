@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import pystray
+from threading import Thread
+from time import sleep
+
 from PIL import Image, ImageDraw
+from pystray import Icon, Menu, MenuItem
 
 import modules.bing
 import modules.chinamap
 import modules.earthmap
-import modules.youwu
 import modules.netbian
 import modules.toopic
+import modules.youwu
 
 
 def create_icon(width, height):
@@ -22,19 +25,33 @@ def create_icon(width, height):
     return image
 
 
+def on_exit():
+    global exited_flag
+    exited_flag = True
+    tray.stop()
+
+
+exited_flag = False
 icon = create_icon(64, 64)
-submenu = pystray.Menu(
-    pystray.MenuItem("地球气象", lambda: modules.earthmap.Wallpaper().crawl().zoom().setup()),
-    pystray.MenuItem("中国气象", lambda: modules.chinamap.Wallpaper().crawl().zoom().setup()),
-    pystray.MenuItem("必应风景", lambda: modules.bing.Wallpaper().crawl().setup()),
-    pystray.MenuItem("尤物网", lambda: modules.youwu.Wallpaper().crawl().setup()),
-    pystray.MenuItem("彼岸网", lambda: modules.netbian.Wallpaper().crawl().setup()),
-    pystray.MenuItem("壁纸社", lambda: modules.toopic.Wallpaper().crawl().setup()),
+
+submenu = Menu(
+    MenuItem("地球气象", lambda: modules.earthmap.Wallpaper().crawl().zoom().setup()),
+    MenuItem("中国气象", lambda: modules.chinamap.Wallpaper().crawl().zoom().setup()),
+    MenuItem("必应风景", lambda: modules.bing.Wallpaper().crawl().setup()),
+    MenuItem("尤物网", lambda: modules.youwu.Wallpaper().crawl().setup()),
+    MenuItem("彼岸网", lambda: modules.netbian.Wallpaper().crawl().setup()),
+    MenuItem("壁纸社", lambda: modules.toopic.Wallpaper().crawl().setup()),
 )
-menu = pystray.Menu(
-    pystray.MenuItem("换壁纸", submenu),
-    pystray.Menu.SEPARATOR,
-    pystray.MenuItem("退出", lambda: tray.stop()),
+menu = Menu(
+    MenuItem("换壁纸", submenu),
+    Menu.SEPARATOR,
+    MenuItem("退出", on_exit),
 )
-tray = pystray.Icon("Wallpaper", icon=icon, menu=menu)
-tray.run()
+
+tray = Icon("Wallpaper", icon=icon, menu=menu)
+Thread(target=tray.run).start()
+
+while True:
+    if exited_flag:
+        break
+    sleep(1)
