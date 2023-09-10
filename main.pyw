@@ -31,9 +31,7 @@ def on_exit():
     tray.stop()
 
 
-exited_flag = False
 icon = create_icon(64, 64)
-
 submenu = Menu(
     MenuItem("地球气象", lambda: modules.earthmap.Wallpaper().crawl().zoom().setup()),
     MenuItem("中国气象", lambda: modules.chinamap.Wallpaper().crawl().zoom().setup()),
@@ -49,7 +47,8 @@ menu = Menu(
 )
 
 tray = Icon("Wallpaper", icon=icon, menu=menu)
-Thread(target=tray.run).start()
+Thread(target=lambda: tray.run()).start()
+exited_flag = False
 
 while True:
     if exited_flag:
