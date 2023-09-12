@@ -9,6 +9,9 @@ jobs:
   build:
 
     runs-on: windows-latest
+    strategy:
+      matrix:
+        architecture: ['x86', 'x64']
 
     steps:
     - uses: actions/checkout@v3
@@ -17,7 +20,7 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.x'
-        architecture: 'x86'
+        architecture: ${{ matrix.architecture }}
 
     - name: Install dependencies
       run: |
@@ -29,30 +32,9 @@ jobs:
       run: |
         pyinstaller -Fw main.pyw
         copy dist/*.exe .
-        7z a TrayWP-x86.zip *.exe
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-
-    - name: Install dependencies
-      run: |
-        choco install upx
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Build with PyInstaller
-      run: |
-        pyinstaller -Fw main.pyw
-        copy dist/*.exe .
-        7z a TrayWP-x86_64.zip *.exe
+        7z a TrayWP-${{ matrix.architecture }}.zip *.exe
 
     - name: Create GitHub release
-      uses: marvinpinto/action-automatic-releases@latest
+      uses: softprops/action-gh-release@v1
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        prerelease: false
-        files: |
-          TrayWP-x86.zip
-          TrayWP-x86_64.zip
+        files: TrayWP-${{ matrix.architecture }}.zip
