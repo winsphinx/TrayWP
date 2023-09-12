@@ -15,13 +15,13 @@ import modules.toopic
 import modules.youwu
 
 
-def create_icon(width, height):
+def create_icon(width, height, colors):
     image = Image.new("RGB", (width, height), "white")
     dc = ImageDraw.Draw(image)
-    dc.rectangle((1, 1, width // 2 - 1, height // 2 - 1), fill="orange")
-    dc.rectangle((width // 2 + 1, 1, width - 1, height // 2 - 1), fill="green")
-    dc.rectangle((1, height // 2 + 1, width // 2 - 1, height - 1), fill="blue")
-    dc.rectangle((width // 2 + 1, height // 2 + 1, width - 1, height - 1), fill="yellow")
+    dc.rectangle((1, 1, width // 2 - 1, height // 2 - 1), fill=colors[0])
+    dc.rectangle((width // 2 + 1, 1, width - 1, height // 2 - 1), fill=colors[1])
+    dc.rectangle((1, height // 2 + 1, width // 2 - 1, height - 1), fill=colors[3])
+    dc.rectangle((width // 2 + 1, height // 2 + 1, width - 1, height - 1), fill=colors[2])
     return image
 
 
@@ -31,7 +31,8 @@ def on_exit():
     tray.stop()
 
 
-icon = create_icon(64, 64)
+colors = ["orange", "green", "yellow", "blue"]
+icon = create_icon(64, 64, colors)
 submenu = Menu(
     MenuItem("地球气象", lambda: modules.earthmap.Wallpaper().crawl().zoom().setup()),
     MenuItem("中国气象", lambda: modules.chinamap.Wallpaper().crawl().zoom().setup()),
@@ -53,4 +54,7 @@ exited_flag = False
 while True:
     if exited_flag:
         break
+    colors = [colors[-1]] + colors[:-1]
+    icon = create_icon(64, 64, colors)
+    tray.icon = icon
     sleep(1)
