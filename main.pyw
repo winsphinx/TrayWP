@@ -12,7 +12,6 @@ import modules.chinamap
 import modules.earthmap
 import modules.netbian
 import modules.toopic
-import modules.youwu
 
 
 def create_icon(width, height, colors):
@@ -37,7 +36,6 @@ submenu = Menu(
     MenuItem("地球气象", lambda: modules.earthmap.Wallpaper().crawl().zoom().setup()),
     MenuItem("中国气象", lambda: modules.chinamap.Wallpaper().crawl().zoom().setup()),
     MenuItem("必应风景", lambda: modules.bing.Wallpaper().crawl().setup()),
-    MenuItem("尤物网", lambda: modules.youwu.Wallpaper().crawl().setup()),
     MenuItem("彼岸网", lambda: modules.netbian.Wallpaper().crawl().setup()),
     MenuItem("壁纸社", lambda: modules.toopic.Wallpaper().crawl().setup()),
 )
