@@ -3,6 +3,7 @@
 
 import os
 import tempfile
+from datetime import datetime, timedelta, timezone
 
 import requests
 import win32api
@@ -16,7 +17,14 @@ class Wallpaper:
         self.image = os.path.join(tempfile.gettempdir(), "wallpaper.jpg")
 
     def crawl(self):
-        picture = "https://img.nsmc.org.cn/CLOUDIMAGE/FY4A/MTCC/FY4A_CHINA.JPG"
+        now = datetime.now()
+        utc_now = now.astimezone(timezone.utc) - timedelta(minutes=30)  # 卫星云图约滞后半小时
+
+        year = utc_now.year
+        month = "{:02d}".format(utc_now.month)
+        day = "{:02d}".format(utc_now.day)
+        hour = "{:02d}".format(utc_now.hour)
+        picture = f"https://img.nsmc.org.cn/CLOUDIMAGE/GEOS/MOS/IRX/PIC/GBAL/{year}{month}{day}/GEOS_IMAGR_GBAL_L2_MOS_IRX_GLL_{year}{month}{day}_{hour}00_10KM_MS.jpg"
         res = requests.get(picture)
         with open(self.image, "wb") as f:
             f.write(res.content)
@@ -30,7 +38,7 @@ class Wallpaper:
 
     def setup(self):
         keyex = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, "Control Panel\\Desktop", 0, win32con.KEY_SET_VALUE)
-        win32api.RegSetValueEx(keyex, "WallpaperStyle", 0, win32con.REG_SZ, "10")
+        win32api.RegSetValueEx(keyex, "WallpaperStyle", 0, win32con.REG_SZ, "2")
         win32api.RegSetValueEx(keyex, "TileWallpaper", 0, win32con.REG_SZ, "0")
         win32gui.SystemParametersInfo(win32con.SPI_SETDESKWALLPAPER, self.image, win32con.SPIF_SENDWININICHANGE)
         """
