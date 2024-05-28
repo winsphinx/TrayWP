@@ -3,6 +3,7 @@
 
 import os
 import tempfile
+from datetime import datetime, timezone
 
 import requests
 import win32api
@@ -10,13 +11,34 @@ import win32con
 import win32gui
 from PIL import Image
 
+Image.MAX_IMAGE_PIXELS = None
+
+
+def get_time_interval(hour, minute):
+    hour = int(hour) - 1
+    minute = (((int(minute) - 30) % 60) // 15) * 15
+    start_time = hour * 10000 + minute * 100
+    end_time = start_time + 1459
+    return (f"{start_time:06d}", f"{end_time:06d}")
+
 
 class Wallpaper:
     def __init__(self):
         self.image = os.path.join(tempfile.gettempdir(), "wallpaper.jpg")
 
     def crawl(self):
-        picture = "https://img.nsmc.org.cn/CLOUDIMAGE/FY4A/MTCC/FY4A_DISK.JPG"
+        now = datetime.now()
+        utc_now = now.astimezone(timezone.utc)
+
+        year = utc_now.year
+        month = "{:02d}".format(utc_now.month)
+        day = "{:02d}".format(utc_now.day)
+        hour = "{:02d}".format(utc_now.hour)
+        minute = "{:02d}".format(utc_now.minute)
+        start_time, end_time = get_time_interval(hour, minute)
+        timestamp = f"{year}{month}{day}{start_time}_{year}{month}{day}{end_time}"
+
+        picture = f"http://img.nsmc.org.cn/CLOUDIMAGE/FY4B/AGRI/GCLR/DISK/FY4B-_AGRI--_N_DISK_1050E_L2-_GCLR_MULT_NOM_{timestamp}_1000M_V0001.JPG"
         res = requests.get(picture)
         with open(self.image, "wb") as f:
             f.write(res.content)
