@@ -18,13 +18,14 @@ class Wallpaper:
 
     def crawl(self):
         now = datetime.now()
-        utc_now = now.astimezone(timezone.utc) - timedelta(minutes=30)  # 卫星云图约滞后半小时
+        utc_now = now.astimezone(timezone.utc) - timedelta(minutes=32)  # 卫星云图约滞后半小时
 
         year = utc_now.year
         month = "{:02d}".format(utc_now.month)
         day = "{:02d}".format(utc_now.day)
         hour = "{:02d}".format(utc_now.hour)
-        picture = f"https://img.nsmc.org.cn/CLOUDIMAGE/GEOS/MOS/IRX/PIC/GBAL/{year}{month}{day}/GEOS_IMAGR_GBAL_L2_MOS_IRX_GLL_{year}{month}{day}_{hour}00_10KM_MS.jpg"
+        date = f"{year}{month}{day}"
+        picture = f"https://img.nsmc.org.cn/CLOUDIMAGE/GEOS/MOS/IRX/PIC/GBAL/{date}/GEOS_IMAGR_GBAL_L2_MOS_IRX_GLL_{date}_{hour}00_10KM_MS.jpg"
         res = requests.get(picture)
         with open(self.image, "wb") as f:
             f.write(res.content)
