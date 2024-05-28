@@ -3,7 +3,7 @@
 
 import os
 import tempfile
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import requests
 import win32api
@@ -15,8 +15,8 @@ Image.MAX_IMAGE_PIXELS = None
 
 
 def get_time_interval(hour, minute):
-    hour = int(hour) - 1
-    minute = (((int(minute) - 30) % 60) // 15) * 15
+    hour = int(hour)
+    minute = (int(minute) // 15) * 15
     start_time = hour * 10000 + minute * 100
     end_time = start_time + 1459
     return (f"{start_time:06d}", f"{end_time:06d}")
@@ -28,7 +28,7 @@ class Wallpaper:
 
     def crawl(self):
         now = datetime.now()
-        utc_now = now.astimezone(timezone.utc)
+        utc_now = now.astimezone(timezone.utc) - timedelta(minutes=90)  # 卫星云图滞后
 
         year = utc_now.year
         month = "{:02d}".format(utc_now.month)
