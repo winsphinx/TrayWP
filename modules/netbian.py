@@ -44,7 +44,7 @@ class Wallpaper:
         page = requests.get(url=page_url, headers=headers)  # 获取此页面元素列表
         tree = etree.HTML(page.text)
 
-        new_url = base_url + random.choice(tree.xpath('//*[@id="main"]/div[3]/ul//a/@href'))
+        new_url = base_url + random.choice(tree.xpath('//*[@id="main"]/div[4]/ul//a/@href'))
         new_page = requests.get(url=new_url, headers=headers)
         new_tree = etree.HTML(new_page.text)
         new_img = new_tree.xpath('//*[@id="img"]/img/@src')[0]  # 获取此图像地址
