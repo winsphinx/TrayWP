@@ -18,7 +18,7 @@ class Wallpaper:
 
     def crawl(self):
         now = datetime.now()
-        utc_now = now.astimezone(timezone.utc) - timedelta(minutes=32)  # 卫星云图约滞后半小时
+        utc_now = now.astimezone(timezone.utc) - timedelta(minutes=30)  # 卫星云图约滞后半小时
 
         year = utc_now.year
         month = "{:02d}".format(utc_now.month)
@@ -29,17 +29,23 @@ class Wallpaper:
         res = requests.get(picture)
         with open(self.image, "wb") as f:
             f.write(res.content)
+
         return self
 
     def zoom(self):
-        w = win32api.GetSystemMetrics(win32con.SM_CXSCREEN)
-        h = win32api.GetSystemMetrics(win32con.SM_CYSCREEN)
-        Image.open(self.image).resize((w, h), Image.Resampling.LANCZOS).save(self.image)
+        monitor_info = win32api.GetMonitorInfo(win32api.MonitorFromPoint((0, 0)))
+        screen_info = monitor_info.get("Monitor")
+        work_info = monitor_info.get("Work")
+        old_image = Image.open(self.image).resize((work_info[2], work_info[3]), Image.Resampling.LANCZOS)
+        new_image = Image.new("RGB", (screen_info[2], screen_info[3]), "black")
+        new_image.paste(old_image, (0, 0))
+        new_image.save(self.image)
+
         return self
 
     def setup(self):
         keyex = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, "Control Panel\\Desktop", 0, win32con.KEY_SET_VALUE)
-        win32api.RegSetValueEx(keyex, "WallpaperStyle", 0, win32con.REG_SZ, "2")
+        win32api.RegSetValueEx(keyex, "WallpaperStyle", 0, win32con.REG_SZ, "0")
         win32api.RegSetValueEx(keyex, "TileWallpaper", 0, win32con.REG_SZ, "0")
         win32gui.SystemParametersInfo(win32con.SPI_SETDESKWALLPAPER, self.image, win32con.SPIF_SENDWININICHANGE)
         """
